@@ -2,8 +2,12 @@ require('dotenv').config()
 
 const fs = require('node:fs');
 const path = require('node:path');
-const {Client, Collection, GatewayIntentBits} = require('discord.js');
+const wait = require('node:timers/promises').setTimeout;
+const {Client, Collection, GatewayIntentBits, InteractionType} = require('discord.js');
+const {missions, getStagesByMissionId, options} = require('./missions')
 const token = process.env.BOT_TOKEN;
+
+const stages = [{name:'stage1', value:'stage1'},{name:'stage2', value:'stage2'}];
 
 // create client instance
 const client = new Client({intents: [GatewayIntentBits.Guilds]});
@@ -23,9 +27,30 @@ client.once('ready', () => {
     console.log('Ready!');
 });
 
+// handle interactions
 client.on('interactionCreate', async interaction => {
-    if(!interaction.isChatInputCommand()) return;
+    if(interaction.isChatInputCommand()){
+        await handleCommands(interaction); 
+        return;
+    }
 
+    if(interaction.type === InteractionType.ApplicationCommandAutocomplete){
+        await handleAutocompletes(interaction);
+        return;
+    }
+
+    if(interaction.isSelectMenu()){
+        await handleSelectMenues(interaction);
+        return;
+    }
+});
+
+function mapToOption(array){
+    return array.map(object => {return {name: object.name, value: object.id}})
+}
+
+// handle slash commands
+async function handleCommands(interaction){
     const command = client.commands.get(interaction.commandName);
 
     if(!command) return;
@@ -34,9 +59,28 @@ client.on('interactionCreate', async interaction => {
         await command.execute(interaction);
     } catch(error) {
         console.error(error);
-        await interaction.reply({content: 'An error was encountered :(', ephemeral: true});
+        await interaction.reply({content: 'An error has occured :(', ephemeral: true});
     }
-});
+};
+
+// handle autocomplete interactions
+async function handleAutocompletes(interaction){
+    if(interaction.commandName === 'time'){
+        await interaction.respond(
+            interaction.options.getFocused(true).name === 'mission'
+            ? mapToOption(missions)
+            : mapToOption(getStagesByMissionId(interaction.options.getString('mission')))
+        );
+    }
+}
+
+// handle selectMenu interactions
+async function handleSelectMenues(interaction){
+    if(interaction.customId === 'select'){
+        console.log(interaction.message.components)
+        await interaction.update({components: interaction.message.components});
+    }
+};
 
 // Login to Discord
 client.login(token);

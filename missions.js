@@ -1,7 +1,13 @@
-const missionsJson = require('./missions.json')
+const missionsJson = require('./data/missions.json')
 const missions = Object.keys(missionsJson.Missions).map(mission => missionsJson.Missions[mission]);
 
 function getMissions(){
+    return missions.map(mission => {
+        return {id: mission.id, name: mission.name}
+    });
+}
+
+function getStages(){
     const result = new Map();
 
     missions.map(mission => {
@@ -27,6 +33,16 @@ function getChoices(){
     });
 }
 
+function getOptions(){
+    return missions.flatMap(mission => {
+        return mission.stages.map(stage => {
+            const stageId = mission.id + stage.id;
+            const stageName = mission.name + ' - ' + stage.name;
+            return {label: stageName, value: stageId};
+        })
+    });
+}
+
 function getMissionNames(){
     return missions.map(mission => mission.name);
 }
@@ -37,4 +53,8 @@ function getStageNames(){
     return result;
 }
 
-module.exports = {missions: getMissions(), choices: getChoices(), missionNames: getMissionNames(), stageNames: getStageNames()};
+function getStagesByMissionId(missionId){
+    return missions.filter(mission => mission.id === missionId)[0].stages;
+}
+
+module.exports = {missions: getMissions(), stages: getStages(), options: getOptions(), choices: getChoices(), missionNames: getMissionNames(), stageNames: getStageNames(), getStagesByMissionId};
