@@ -1,0 +1,19 @@
+{
+  "name": "leaderboards",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "bot": "nodemon bot.js",
+    "commands": "node deploy-commands.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/rest": "^1.0.1",
+    "discord.js": "^14.0.3",
+    "dotenv": "^16.0.1"
+  }
+}
