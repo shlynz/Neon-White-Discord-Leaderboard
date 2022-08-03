@@ -1,5 +1,4 @@
 const {SlashCommandBuilder} = require('discord.js');
-const {stages} = require('../missions');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -26,7 +25,6 @@ module.exports = {
         const stageId = interaction.options.getString('stage');
         const time = interaction.options.getString('time');
         const message = 'Added your new time of ' + time + ' for the stage ' + stageId + ' in the mission ' + missionId;
-        console.log(stages.get(missionId+stageId))
         await interaction.reply(message);
     }
 };

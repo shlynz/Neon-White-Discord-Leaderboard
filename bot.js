@@ -2,9 +2,8 @@ require('dotenv').config()
 
 const fs = require('node:fs');
 const path = require('node:path');
-const wait = require('node:timers/promises').setTimeout;
 const {Client, Collection, GatewayIntentBits, InteractionType} = require('discord.js');
-const {missions, getStagesByMissionId, options} = require('./missions')
+const {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser} = require('./missions');
 const token = process.env.BOT_TOKEN;
 
 const stages = [{name:'stage1', value:'stage1'},{name:'stage2', value:'stage2'}];
@@ -45,10 +44,6 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
-function mapToOption(array){
-    return array.map(object => {return {name: object.name, value: object.id}})
-}
-
 // handle slash commands
 async function handleCommands(interaction){
     const command = client.commands.get(interaction.commandName);
@@ -66,21 +61,22 @@ async function handleCommands(interaction){
 // handle autocomplete interactions
 async function handleAutocompletes(interaction){
     if(interaction.commandName === 'time'){
-        await interaction.respond(
-            interaction.options.getFocused(true).name === 'mission'
-            ? mapToOption(missions)
-            : mapToOption(getStagesByMissionId(interaction.options.getString('mission')))
-        );
+        if(interaction.options.getFocused(true).name === 'mission'){
+            getMissions()
+                .then(missions => mapToOption(missions))
+                .then(options => interaction.respond(options));
+        } else {
+            getStagesByMission(interaction.options.getString('mission'))
+                .then(stages => mapToOption(stages))
+                .then(options => interaction.respond(options))
+        }
     }
 }
 
-// handle selectMenu interactions
-async function handleSelectMenues(interaction){
-    if(interaction.customId === 'select'){
-        console.log(interaction.message.components)
-        await interaction.update({components: interaction.message.components});
-    }
-};
+// maps json from the db to options for autocomplete
+function mapToOption(array){
+    return array.map(object => {return {name: object.name, value: object.id}})
+}
 
 // Login to Discord
 client.login(token);

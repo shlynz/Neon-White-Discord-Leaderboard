@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "bot": "nodemon bot.js",
-    "commands": "node deploy-commands.js"
+    "commands": "node deploy-commands.js",
+    "db": "npx json-server --routes data/routes.json --watch data/db.json --port 8000"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +15,7 @@
   "dependencies": {
     "@discordjs/rest": "^1.0.1",
     "discord.js": "^14.0.3",
-    "dotenv": "^16.0.1"
+    "dotenv": "^16.0.1",
+    "node-fetch": "^2.6.1"
   }
 }

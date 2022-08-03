@@ -1,60 +1,50 @@
-const missionsJson = require('./data/missions.json')
-const missions = Object.keys(missionsJson.Missions).map(mission => missionsJson.Missions[mission]);
+const fetch = require('node-fetch');
+require('dotenv').config();
+const URL = process.env.URL;
 
 function getMissions(){
-    return missions.map(mission => {
-        return {id: mission.id, name: mission.name}
-    });
+    return fetch(`${URL}/missions`)
+        .then(res => res.json());
 }
 
 function getStages(){
-    const result = new Map();
-
-    missions.map(mission => {
-        return mission.stages.map(stage => {
-            const stageId = mission.id + stage.id;
-            result.set(stageId, {
-                mission: mission.name,
-                stage: stage.name
-            });
-        })
-    })
-
-    return result;
+    return fetch(`${URL}/stages`)
+        .then(res => res.json());
 }
 
-function getChoices(){
-    return missions.flatMap(mission => {
-        return mission.stages.map(stage => {
-            const stageId = mission.id + stage.id;
-            const stageName = mission.name + ' - ' + stage.name;
-            return {name: stageName, value: stageId};
-        })
-    });
+function getStagesByMission(missionId){
+    return fetch(`${URL}/missions/${missionId}/stages`)
+        .then(res => res.json());
 }
 
-function getOptions(){
-    return missions.flatMap(mission => {
-        return mission.stages.map(stage => {
-            const stageId = mission.id + stage.id;
-            const stageName = mission.name + ' - ' + stage.name;
-            return {label: stageName, value: stageId};
-        })
-    });
+function getTopTimes(userId){
+    console.log(userId)
+    const fetchUrlEnd = userId
+        ? `user/${userId}/top`
+        : `top`;
+    return getStages()
+        .then(stages =>
+            Promise.all(stages.map(stage =>
+                fetch(`${URL}/stages/times/${stage.id}/${fetchUrlEnd}`)
+                    .then(res => res.json())
+                    .then(json => json[0])
+                    .then(entry => {
+                        if(!entry) return {error: true};
+                        const id = entry.stageId;
+                        const missionName = entry.mission.name;
+                        const stageName = entry.stage.name;
+                        const stageTime = entry.time;
+                        const userName = entry.user.name;
+                        return {id, missionName, stageName, stageTime, userName, userId};
+                    })
+            ))
+        )
+        .then(times => Promise.all(times.filter(time => !time.error)));
 }
 
-function getMissionNames(){
-    return missions.map(mission => mission.name);
+function getTopTimesByUser(userId){
+    return getTopTimes(userId)
+        .then(topTimes => topTimes.filter(topTime => topTime.userId === userId));
 }
 
-function getStageNames(){
-    const result = new Map();
-    missions.map(mission => result.set(mission.name, mission.stages.map(stage => stage.name)));
-    return result;
-}
-
-function getStagesByMissionId(missionId){
-    return missions.filter(mission => mission.id === missionId)[0].stages;
-}
-
-module.exports = {missions: getMissions(), stages: getStages(), options: getOptions(), choices: getChoices(), missionNames: getMissionNames(), stageNames: getStageNames(), getStagesByMissionId};
+module.exports = {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser}
