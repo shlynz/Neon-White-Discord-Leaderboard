@@ -2,7 +2,7 @@ require('dotenv').config();
 const fetch = require('node-fetch');
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const {missions} = require('../missions');
-const {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser} = require('../newMissions')
+const {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser} = require('../missions')
 const URL = process.env.URL;
 
 function createEmbed(userId){
