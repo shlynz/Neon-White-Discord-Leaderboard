@@ -2,11 +2,7 @@
     "users": [
         {
             "id": "01",
-            "name": "Shlynz"
-        },
-        {
-            "id": "02",
-            "name": "Reshi"
+            "name": "Example"
         }
     ],
     "missions": [
@@ -155,34 +151,6 @@
             "missionId": "01",
             "stageId": "0101",
             "time": "1234",
-            "date": ""
-        },
-        {
-            "userId": "01",
-            "missionId": "01",
-            "stageId": "0102",
-            "time": "5678",
-            "date": ""
-        },
-        {
-            "userId": "01",
-            "missionId": "02",
-            "stageId": "0201",
-            "time": "9012",
-            "date": ""
-        },
-        {
-            "userId": "02",
-            "missionId": "01",
-            "stageId": "0101",
-            "time": "2345",
-            "date": ""
-        },
-        {
-            "userId": "01",
-            "missionId": "01",
-            "stageId": "0101",
-            "time": "2345",
             "date": ""
         }
     ]
