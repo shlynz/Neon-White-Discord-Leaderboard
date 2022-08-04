@@ -1,8 +1,7 @@
 require('dotenv').config();
 const fetch = require('node-fetch');
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const {missions, getTime} = require('../db');
-const {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser, getUserName} = require('../db')
+const {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser, getTime, getUserName} = require('../db')
 const URL = process.env.URL;
 
 function createEmbed(userId){
@@ -15,12 +14,15 @@ function createEmbed(userId){
             )
         .then(embed => embed.setTimestamp())
         .then(embed =>
+            // get all stages
             getStages()
                 .then(stages => stages.length)
                 .then(amountStages =>
+                    // get users best times
                     getTopTimes(userId)
                         .then(times => times.length)
                         .then(amountTimes =>
+                            // get top times of user
                             getTopTimesByUser(userId)
                                 .then(topTimes => topTimes.length)
                                 .then(amountTopTimes => embed.setDescription(`Currently completed ${amountTimes}/${amountStages} stage(s), with ${amountTopTimes} top time(s).`))
@@ -57,51 +59,6 @@ function createEmbed(userId){
                 )
         );
 }
-
-function getUserTimes(userId){
-    const times = [];
-    fetch(URL + "/stages")
-        .then(res => res.json())
-        .then(stages => {
-            stages.forEach(async stage => {
-                return await fetch(`${URL}/stages/times/${stage.id}/user/${userId}/top`)
-                    .then(res => res.json())
-                    .then(json => json[0])
-                    .then(entry => {
-                        if(!entry) return {id: 'nix'};
-                        console.log(entry)
-                        const id = entry.stageId;
-                        const missionName = entry.mission.name;
-                        const stageName = entry.stage.name;
-                        const stageTime = entry.time;
-                        times.push({id, missionName, stageName, stageTime});
-                    });
-        })
-    })
-    return times;
-}
-
-/*
-const exampleEmbed = new EmbedBuilder()
-	.setColor(0x0099FF)
-	.setTitle('Some title')
-	.setURL('https://discord.js.org/')
-	.setAuthor({ name: 'Some name', iconURL: 'https://i.imgur.com/AfFp7pu.png', url: 'https://discord.js.org' })
-	.setDescription('Some description here')
-	.setThumbnail('https://i.imgur.com/AfFp7pu.png')
-	.addFields(
-		{ name: 'Regular field title', value: 'Some value here' },
-		{ name: '\u200B', value: '\u200B' },
-		{ name: 'Inline field title', value: 'Some value here', inline: true },
-		{ name: 'Inline field title', value: 'Some value here', inline: true },
-	)
-	.addFields({ name: 'Inline field title', value: 'Some value here', inline: true })
-	.setImage('https://i.imgur.com/AfFp7pu.png')
-	.setTimestamp()
-	.setFooter({ text: 'Some footer text here', iconURL: 'https://i.imgur.com/AfFp7pu.png' });
-
-channel.send({ embeds: [exampleEmbed] });
-*/
 
 module.exports = {
     data : new SlashCommandBuilder()
