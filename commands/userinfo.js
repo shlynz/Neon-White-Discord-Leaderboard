@@ -57,15 +57,24 @@ function createEmbed(userId){
                     // add all the missions, each as a separate field
                     .then(times => embed.addFields(...times))
                 )
+        )
+        .catch(error => 
+            new EmbedBuilder()
+                .setColor(0xFF0000)
+                .setTitle('*Error*')
+                .setDescription('Couldn\'t find the specified user in the database :(')
+                .setTimestamp()
         );
 }
 
 module.exports = {
     data : new SlashCommandBuilder()
         .setName('userinfo')
-        .setDescription('Returns your times'),
+        .setDescription('Returns the times of the specified user, or yourself if noone specified')
+        .addUserOption(option => option.setName('target').setDescription('The user to output')),
     async execute(interaction){
-        createEmbed(interaction.user.id)
+        const target = interaction.options.getUser('target') || interaction.user
+        createEmbed(target.id)
             .then(embed => interaction.reply({embeds: [embed]}))
     }
 }
