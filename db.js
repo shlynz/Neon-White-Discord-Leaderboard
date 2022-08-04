@@ -18,7 +18,6 @@ function getStagesByMission(missionId){
 }
 
 function getTopTimes(userId){
-    console.log(userId)
     const fetchUrlEnd = userId
         ? `user/${userId}/top`
         : `top`;
@@ -47,4 +46,13 @@ function getTopTimesByUser(userId){
         .then(topTimes => topTimes.filter(topTime => topTime.userId === userId));
 }
 
-module.exports = {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser}
+function getTime(stageId, userId){
+    const fetchUrlEnd = userId
+        ? `user/${userId}/top`
+        : `top`;
+    return fetch(`${URL}/stages/times/${stageId}/${fetchUrlEnd}`)
+        .then(res => res.json())
+        .then(json => json[0]);
+}
+
+module.exports = {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser, getTime}
