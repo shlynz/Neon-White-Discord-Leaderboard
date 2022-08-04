@@ -34,6 +34,7 @@ function getTopTimes(userId){
                         const stageName = entry.stage.name;
                         const stageTime = entry.time;
                         const userName = entry.user.name;
+                        const userId = entry.user.id;
                         return {id, missionName, stageName, stageTime, userName, userId};
                     })
             ))
@@ -42,7 +43,7 @@ function getTopTimes(userId){
 }
 
 function getTopTimesByUser(userId){
-    return getTopTimes(userId)
+    return getTopTimes()
         .then(topTimes => topTimes.filter(topTime => topTime.userId === userId));
 }
 
@@ -55,4 +56,10 @@ function getTime(stageId, userId){
         .then(json => json[0]);
 }
 
-module.exports = {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser, getTime}
+function getUserName(userId){
+    return fetch(`${URL}/users/${userId}`)
+        .then(res => res.json())
+        .then(json => json[0]);
+}
+
+module.exports = {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser, getTime, getUserName}

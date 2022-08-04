@@ -1,33 +1,60 @@
 require('dotenv').config();
 const fetch = require('node-fetch');
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const {missions} = require('../missions');
-const {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser} = require('../missions')
+const {missions, getTime} = require('../db');
+const {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser, getUserName} = require('../db')
 const URL = process.env.URL;
 
 function createEmbed(userId){
     return Promise
         .resolve(new EmbedBuilder())
         .then(embed => embed.setColor(0xFFFFFF))
-        .then(embed => embed.setTitle(userId))
-        .then(embed => embed.setTimestamp())
-        .then(embed => {
-            return getStages()
-                .then(stages => stages.length)
-                .then(amountStages => {
-                    return getTopTimesByUser(userId)
-                        .then(times => times.length)
-                        .then(amountTimes => embed.setDescription(`Currently completed ${amountTimes}/${amountStages} stages.`))
-                })
-        })
-        .then(embed => {
-            embed.addFields({name: 'Test', value: 'Text'});
-            return embed;
-        })
         .then(embed =>
+            getUserName(userId)
+                .then(user => embed.setTitle(user.name))
+            )
+        .then(embed => embed.setTimestamp())
+        .then(embed =>
+            getStages()
+                .then(stages => stages.length)
+                .then(amountStages =>
+                    getTopTimes(userId)
+                        .then(times => times.length)
+                        .then(amountTimes =>
+                            getTopTimesByUser(userId)
+                                .then(topTimes => topTimes.length)
+                                .then(amountTopTimes => embed.setDescription(`Currently completed ${amountTimes}/${amountStages} stage(s), with ${amountTopTimes} top time(s).`))
+                        )
+                )
+        )
+        .then(embed =>
+            // get all missions
             getMissions()
-                .then(missions => missions.map(mission => `${mission.id}: ${mission.name}`))
-                .then(missions => embed.addFields({name: 'Mission', value: missions.join('\n')}))
+                .then(missions =>
+                    // map every mission to a string list of the stages and their times 
+                    Promise.all(
+                        missions.map(mission =>
+                            // get the stages of the given mission
+                            getStagesByMission(mission.id)
+                                .then(stages => 
+                                    Promise.all(
+                                        // map the stages to a string of the name and the time, NA if no time was found
+                                        stages.map(stage =>
+                                            getTime(stage.id)
+                                                .then(result => `${stage.name}: ${result?.time || 'NA'}`)
+                                        )
+                                    )
+                                    .then(times => times.join('\n'))
+                                )
+                                // return the result in the required field format for the embed
+                                .then(stageTimes => {
+                                    return {name: mission.name, value: stageTimes, inline: true}
+                                })
+                        )
+                    )
+                    // add all the missions, each as a separate field
+                    .then(times => embed.addFields(...times))
+                )
         );
 }
 
@@ -54,13 +81,6 @@ function getUserTimes(userId){
     return times;
 }
 
-function mapTimesToMissionStages(times){
-    const misisons = new Map();
-    times.forEach(time => {
-        
-    });
-}
-
 /*
 const exampleEmbed = new EmbedBuilder()
 	.setColor(0x0099FF)
@@ -85,16 +105,10 @@ channel.send({ embeds: [exampleEmbed] });
 
 module.exports = {
     data : new SlashCommandBuilder()
-        .setName('get_users')
-        .setDescription('Returns all Users, with their time'),
+        .setName('userinfo')
+        .setDescription('Returns your times'),
     async execute(interaction){
-        const users = await fetch('http://localhost:8000/users')
-            .then(res => res.json())
-            .then(json => json);
-        console.log(users);
-        //interaction.reply(message.join('\n'));
-        //interaction.reply({embeds: [createEmbed('Shlynz', 'test')]});
-        createEmbed('01')
+        createEmbed(interaction.user.id)
             .then(embed => interaction.reply({embeds: [embed]}))
     }
 }

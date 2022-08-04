@@ -3,7 +3,7 @@ require('dotenv').config()
 const fs = require('node:fs');
 const path = require('node:path');
 const {Client, Collection, GatewayIntentBits, InteractionType} = require('discord.js');
-const {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser} = require('./missions');
+const {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser} = require('./db');
 const token = process.env.BOT_TOKEN;
 
 const stages = [{name:'stage1', value:'stage1'},{name:'stage2', value:'stage2'}];
