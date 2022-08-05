@@ -62,4 +62,44 @@ function getUserName(userId){
         .then(json => json[0]);
 }
 
-module.exports = {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser, getTime, getUserName}
+function getTopTimesAsEmbed(userId){
+    return getMissions()
+        .then(missions =>
+            // map every mission to a string list of the stages and their times 
+            Promise.all(
+                missions.map(mission =>
+                    // get the stages of the given mission
+                    getStagesByMission(mission.id)
+                        .then(stages => 
+                            Promise.all(
+                                // map the stages to a string of the name and the time, NA if no time was found
+                                stages.map(stage =>
+                                    getTime(stage.id, userId)
+                                        .then(result => `${stage.name}: ${result?.time || 'NA'}`)
+                                )
+                            )
+                            .then(times => times.join('\n'))
+                        )
+                        // return the result in the required field format for the embed
+                        .then(stageTimes => {
+                            return {name: mission.name, value: stageTimes, inline: true}
+                        })
+                )
+            )
+        )
+}
+
+function insertUser(user){
+    const data = {
+        id: user.id,
+        name: user.username
+    };
+    return fetch(`${URL}/users/`,
+    {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    });
+}
+
+module.exports = {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser, getTime, getUserName, getTopTimesAsEmbed, insertUser}

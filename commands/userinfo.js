@@ -1,7 +1,7 @@
 require('dotenv').config();
 const fetch = require('node-fetch');
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser, getTime, getUserName} = require('../db')
+const {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser, getTime, getUserName, getTopTimesAsEmbed} = require('../db')
 const URL = process.env.URL;
 
 function createEmbed(userId){
@@ -30,33 +30,9 @@ function createEmbed(userId){
                 )
         )
         .then(embed =>
-            // get all missions
-            getMissions()
-                .then(missions =>
-                    // map every mission to a string list of the stages and their times 
-                    Promise.all(
-                        missions.map(mission =>
-                            // get the stages of the given mission
-                            getStagesByMission(mission.id)
-                                .then(stages => 
-                                    Promise.all(
-                                        // map the stages to a string of the name and the time, NA if no time was found
-                                        stages.map(stage =>
-                                            getTime(stage.id)
-                                                .then(result => `${stage.name}: ${result?.time || 'NA'}`)
-                                        )
-                                    )
-                                    .then(times => times.join('\n'))
-                                )
-                                // return the result in the required field format for the embed
-                                .then(stageTimes => {
-                                    return {name: mission.name, value: stageTimes, inline: true}
-                                })
-                        )
-                    )
-                    // add all the missions, each as a separate field
-                    .then(times => embed.addFields(...times))
-                )
+            getTimesAsEmbed(userId)
+                .then(times => embed.addFields(...times))
+                
         )
         .catch(error => 
             new EmbedBuilder()

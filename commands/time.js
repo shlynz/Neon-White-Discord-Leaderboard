@@ -20,7 +20,6 @@ module.exports = {
                 .setDescription('Your achieved time')
                 .setRequired(true)),
     async execute(interaction){
-        console.log(interaction)
         const missionId = interaction.options.getString('mission');
         const stageId = interaction.options.getString('stage');
         const time = interaction.options.getString('time');
