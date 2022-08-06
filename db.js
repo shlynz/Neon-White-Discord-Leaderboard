@@ -2,21 +2,38 @@ const fetch = require('node-fetch');
 require('dotenv').config();
 const URL = process.env.URL;
 
+// returns all missions
 function getMissions(){
     return fetch(`${URL}/missions`)
         .then(res => res.json());
 }
 
+// returns a mission by id
+function getMissionById(missionId){
+    return fetch(`${URL}/missions/${missionId}`)
+        .then(res => res.json())
+        .then(json => json[0]);
+}
+
+// return all stages
 function getStages(){
     return fetch(`${URL}/stages`)
         .then(res => res.json());
 }
 
+// return a stage by id
+function getStageById(stageId){
+    return fetch(`${URL}/stages/${stageId}`)
+        .then(res => res.json());
+}
+
+// return all stages in mission by id
 function getStagesByMission(missionId){
     return fetch(`${URL}/missions/${missionId}/stages`)
         .then(res => res.json());
 }
 
+// return the top time of all stages, users best times if given
 function getTopTimes(userId){
     const fetchUrlEnd = userId
         ? `user/${userId}/top`
@@ -42,11 +59,13 @@ function getTopTimes(userId){
         .then(times => Promise.all(times.filter(time => !time.error)));
 }
 
+// return the top times that were done by given user
 function getTopTimesByUser(userId){
     return getTopTimes()
         .then(topTimes => topTimes.filter(topTime => topTime.userId === userId));
 }
 
+// return the top time of the given stage, users best time if given
 function getTime(stageId, userId){
     const fetchUrlEnd = userId
         ? `user/${userId}/top`
@@ -56,12 +75,14 @@ function getTime(stageId, userId){
         .then(json => json[0]);
 }
 
+// return user by id
 function getUserName(userId){
     return fetch(`${URL}/users/${userId}`)
         .then(res => res.json())
         .then(json => json[0]);
 }
 
+// return all top times, formatted as embed ready, users best times if given
 function getTopTimesAsEmbed(userId){
     return getMissions()
         .then(missions =>
@@ -89,6 +110,46 @@ function getTopTimesAsEmbed(userId){
         )
 }
 
+// return top times of given mission, formatted as embed ready, users best time if given
+function getMissionTopTimesAsEmbed(missionId, userId){
+    return getMissionById(missionId)
+        .then(mission =>
+            getStagesByMission(mission.id)
+                .then(stages =>
+                    Promise.all(
+                        stages.map(stage =>
+                            getStageTopTimeAsString(stage.id, userId)
+                        )
+                    )
+                    .then(times => times.join('\n'))
+                )
+                .then(stageTimes => {
+                    return {name: mission.name, value: stageTimes, inline: true}
+                })
+        )
+}
+
+// return top time of given stage, formatted as string (stageName: time or NA), users best time if given
+function getStageTopTimeAsString(stageId, userId){
+    return getStageById(stageId)
+        .then(stage => 
+            getTime(stage.id, userId)
+                .then(result => `${stage.name}: ${result?.time || 'NA'}`)
+        )
+}
+
+// return top time of given stage, formatted as embed ready, users best time if given
+function getStageTopTimeAsEmbed(stageId, userId){
+    return getStageById(stageId)
+        .then(stage =>
+            getTime(stageId, userId)
+                .then(result => {
+                    return {name: result.mission.name, value: `${result.stage.name}: ${result?.time || 'NA'}`}
+                })
+        )
+}
+
+// add Discord user to db
 function insertUser(user){
     const data = {
         id: user.id,
@@ -102,4 +163,4 @@ function insertUser(user){
     });
 }
 
-module.exports = {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser, getTime, getUserName, getTopTimesAsEmbed, insertUser}
+module.exports = {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser, getTime, getUserName, getTopTimesAsEmbed, getMissionTopTimesAsEmbed, getStageTopTimeAsEmbed, insertUser}

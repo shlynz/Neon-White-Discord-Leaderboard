@@ -6,8 +6,6 @@ const {Client, Collection, GatewayIntentBits, InteractionType} = require('discor
 const {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser} = require('./db');
 const token = process.env.BOT_TOKEN;
 
-const stages = [{name:'stage1', value:'stage1'},{name:'stage2', value:'stage2'}];
-
 // create client instance
 const client = new Client({intents: [GatewayIntentBits.Guilds]});
 
@@ -59,17 +57,22 @@ async function handleCommands(interaction){
 };
 
 // handle autocomplete interactions
-async function handleAutocompletes(interaction){
-    if(interaction.commandName === 'time'){
-        if(interaction.options.getFocused(true).name === 'mission'){
-            getMissions()
-                .then(missions => mapToOption(missions))
-                .then(options => interaction.respond(options));
-        } else {
-            getStagesByMission(interaction.options.getString('mission'))
-                .then(stages => mapToOption(stages))
-                .then(options => interaction.respond(options))
-        }
+function handleAutocompletes(interaction){
+    if(interaction.commandName === 'time' || interaction.commandName == 'toptime'){
+        const missionId = interaction.options.getString('mission');
+        const focusedOption = interaction.options.getFocused().toLowerCase();
+
+        Promise.resolve(interaction.options.getFocused(true).name === 'mission')
+            .then(isMission => {
+                if(isMission){
+                    return getMissions()
+                } else {
+                    return getStagesByMission(missionId)
+                }
+            })
+            .then(result => mapToOption(result))
+            .then(options => options.filter(option => option.name.toLowerCase().includes(focusedOption)))
+            .then(filteredOptions => interaction.respond(filteredOptions))
     }
 }
 
