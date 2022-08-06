@@ -27,32 +27,29 @@ client.once('ready', () => {
 // handle interactions
 client.on('interactionCreate', async interaction => {
     if(interaction.isChatInputCommand()){
-        await handleCommands(interaction); 
-        return;
+        return handleCommands(interaction);
     }
 
     if(interaction.type === InteractionType.ApplicationCommandAutocomplete){
-        await handleAutocompletes(interaction);
-        return;
+        return handleAutocompletes(interaction);
     }
 
     if(interaction.isSelectMenu()){
-        await handleSelectMenues(interaction);
-        return;
+        return handleSelectMenues(interaction);
     }
 });
 
 // handle slash commands
-async function handleCommands(interaction){
+function handleCommands(interaction){
     const command = client.commands.get(interaction.commandName);
 
     if(!command) return;
 
     try {
-        await command.execute(interaction);
+        command.execute(interaction);
     } catch(error) {
         console.error(error);
-        await interaction.reply({content: 'An error has occured :(', ephemeral: true});
+        interaction.reply({content: 'An error has occured :(', ephemeral: true});
     }
 };
 

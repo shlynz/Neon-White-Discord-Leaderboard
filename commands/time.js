@@ -24,6 +24,6 @@ module.exports = {
         const stageId = interaction.options.getString('stage');
         const time = interaction.options.getString('time');
         const message = 'Added your new time of ' + time + ' for the stage ' + stageId + ' in the mission ' + missionId;
-        await interaction.reply(message);
+        interaction.reply(message);
     }
 };
