@@ -1,7 +1,7 @@
 require('dotenv').config();
 const fetch = require('node-fetch');
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser, getTime, getUserName, getTopTimesAsEmbed} = require('../db')
+const {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser, getTime, getUser, getTopTimesAsEmbed} = require('../db')
 const URL = process.env.URL;
 
 function createEmbed(userId){
@@ -9,7 +9,7 @@ function createEmbed(userId){
         .resolve(new EmbedBuilder())
         .then(embed => embed.setColor(0xFFFFFF))
         .then(embed =>
-            getUserName(userId)
+            getUser(userId)
                 .then(user => embed.setTitle(user.name))
             )
         .then(embed => embed.setTimestamp())
@@ -30,16 +30,18 @@ function createEmbed(userId){
                 )
         )
         .then(embed =>
-            getTimesAsEmbed(userId)
+            getTopTimesAsEmbed(userId)
                 .then(times => embed.addFields(...times))
                 
         )
-        .catch(error => 
-            new EmbedBuilder()
+        .catch(error => {
+            console.log(error)
+            return new EmbedBuilder()
                 .setColor(0xFF0000)
                 .setTitle('*Error*')
                 .setDescription('Couldn\'t find the specified user in the database :(')
                 .setTimestamp()
+        }
         );
 }
 

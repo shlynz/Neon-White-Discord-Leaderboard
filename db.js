@@ -24,7 +24,8 @@ function getStages(){
 // return a stage by id
 function getStageById(stageId){
     return fetch(`${URL}/stages/${stageId}`)
-        .then(res => res.json());
+        .then(res => res.json())
+        .then(json => json[0]);
 }
 
 // return all stages in mission by id
@@ -76,7 +77,7 @@ function getTime(stageId, userId){
 }
 
 // return user by id
-function getUserName(userId){
+function getUser(userId){
     return fetch(`${URL}/users/${userId}`)
         .then(res => res.json())
         .then(json => json[0]);
@@ -103,7 +104,7 @@ function getTopTimesAsEmbed(userId){
                         )
                         // return the result in the required field format for the embed
                         .then(stageTimes => {
-                            return {name: mission.name, value: stageTimes, inline: true}
+                            return {name: mission.name, value: stageTimes}
                         })
                 )
             )
@@ -124,7 +125,7 @@ function getMissionTopTimesAsEmbed(missionId, userId){
                     .then(times => times.join('\n'))
                 )
                 .then(stageTimes => {
-                    return {name: mission.name, value: stageTimes, inline: true}
+                    return {name: mission.name, value: stageTimes}
                 })
         )
 }
@@ -163,4 +164,21 @@ function insertUser(user){
     });
 }
 
-module.exports = {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser, getTime, getUserName, getTopTimesAsEmbed, getMissionTopTimesAsEmbed, getStageTopTimeAsEmbed, insertUser}
+// add time for specified stage to db
+function insertTime(userId, missionId, stageId, time){
+    const data = {
+        userId,
+        missionId,
+        stageId,
+        time,
+        date: Date.now()
+    };
+    return fetch(`${URL}/times/`,
+    {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    });
+}
+
+module.exports = {getMissions, getMissionById, getStages, getStageById, getStagesByMission, getTopTimes, getTopTimesByUser, getTime, getUser, getTopTimesAsEmbed, getMissionTopTimesAsEmbed, getStageTopTimeAsEmbed, insertUser, insertTime}

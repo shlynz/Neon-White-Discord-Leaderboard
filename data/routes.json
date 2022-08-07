@@ -1,5 +1,5 @@
 {
-    "/stages/:missionId/:stageId": "/stages?stageId=:missionId:stageId&_expand=mission",
+    "/stages/:stageId": "/stages?id=:stageId&_expand=mission",
     "/stages/times/:stageId": "/times?&stageId=:stageId&_expand=mission&_expand=stage&_expand=user&_sort=time&_order=asc",
     "/stages/times/:stageId/top": "/times?stageId=:stageId&_expand=mission&_expand=stage&_expand=user&_sort=time&_order=asc&_limit=1",
     "/stages/times/:stageId/user/:userId": "/times?userId=:userId&stageId=:stageId&_expand=mission&_expand=stage&_expand=user&_sort=time&_order=asc",
