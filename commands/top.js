@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require("@discordjs/builders");
 const { SlashCommandBuilder } = require("discord.js");
-const { getStageTopTimeAsEmbed, getMissionTopTimesAsEmbed, getTopTimesAsEmbed } = require("../db");
+const { getStageTopTimeAsEmbed, getMissionTopTimesAsEmbed, getTopTimesAsEmbed } = require("../data/db");
 
 function getNeededEmbed(missionId, stageId){
     if(missionId){

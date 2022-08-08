@@ -1,9 +1,8 @@
-const {SlashCommandBuilder, EmbedBuilder} = require('discord.js');
-const { getStageById, getUser, insertTime } = require('../db');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { getStageById, getUser, insertTime } = require('../data/db');
 
 const isShortTimestamp = (time) => time.match(/\d{1,2}\.\d{3}/g)?.[0] === time;
 const isLongTimestamp = (time) =>  time.match(/\d{1,2}:\d{2}\.\d{3}/g)?.[0] === time;
-const isValidTime = (time) => isShortTimestamp(time) || isLongTimestamp(time);
 
 module.exports = {
     data: new SlashCommandBuilder()
