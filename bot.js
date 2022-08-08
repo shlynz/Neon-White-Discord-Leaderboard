@@ -3,7 +3,7 @@ require('dotenv').config()
 const fs = require('node:fs');
 const path = require('node:path');
 const {Client, Collection, GatewayIntentBits, InteractionType} = require('discord.js');
-const {getMissions, getStages, getStagesByMission, getTopTimes, getTopTimesByUser} = require('./db');
+const { getMissions, getStagesByMission, insertTime } = require('./data/db');
 const token = process.env.BOT_TOKEN;
 
 // create client instance

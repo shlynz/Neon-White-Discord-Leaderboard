@@ -51,8 +51,8 @@ function getTopTimes(userId){
                         const missionName = entry.mission.name;
                         const stageName = entry.stage.name;
                         const stageTime = entry.time;
-                        const userName = entry.user.name;
-                        const userId = entry.user.id;
+                        const userName = entry.user?.name || 'NA';
+                        const userId = entry.user?.id || 'NA';
                         return {id, missionName, stageName, stageTime, userName, userId};
                     })
             ))
