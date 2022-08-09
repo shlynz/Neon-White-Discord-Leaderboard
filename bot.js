@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const {Client, Collection, GatewayIntentBits, InteractionType} = require('discord.js');
 const { getMissions, getStagesByMission, insertTime } = require('./data/db');
+const readline = require('readline');
 const token = process.env.BOT_TOKEN;
 
 // create client instance
@@ -22,6 +23,7 @@ for(const file of commandFiles) {
 // when client is ready, run this once
 client.once('ready', () => {
     console.log('Ready!');
+    //bulkregister();
 });
 
 // handle interactions
@@ -80,3 +82,19 @@ function mapToOption(array){
 
 // Login to Discord
 client.login(token);
+
+// registers a bunch of times in bulk
+// usefull for initial time registering
+function bulkregister(){
+    const file = readline.createInterface({
+        input: fs.createReadStream('./data/bulkregister.txt'),
+        output: process.stdout,
+        terminal: false
+    });
+    file.on('line', line => {
+        let [userId, missionId, stageId, time] = line.split(';');
+        missionId = missionId?.padStart(2, '0');
+        stageId = missionId + stageId?.padStart(2, '0');
+        insertTime(userId, missionId, stageId, time);
+    });
+}

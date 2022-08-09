@@ -1,0 +1,1 @@
+userId;missionNr;stageNr;MM:SS.sss
