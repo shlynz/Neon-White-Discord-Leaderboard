@@ -10,6 +10,8 @@ This is a bot that intends to improve the experience of racing against your serv
   - Shows the top time(s) for the specified query. Shows all top times if nothing is specified
 - `/userinfo [user]`
   - Shows the top times of the specified user. If none specified, calling user is used
+- `/todo`
+  - Shows stages you currently don't have the top time in
 
 ### Current version:
 The current version of this bot is very much still in development and doesn't really offer any usable feature.
