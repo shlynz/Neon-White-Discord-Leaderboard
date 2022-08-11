@@ -97,7 +97,7 @@ function getTopTimesAsEmbed(userId){
                                 // map the stages to a string of the name and the time, NA if no time was found
                                 stages.map(stage =>
                                     getTime(stage.id, userId)
-                                        .then(result => `${stage.name}: ${result?.time || 'NA'}`)
+                                        .then(result => `${stage.name}: ${result?.time || 'NA'} by ${userId ? 'yourself :)' : result?.user.name || 'NA'}`)
                                 )
                             )
                             .then(times => times.join('\n'))
@@ -135,7 +135,7 @@ function getStageTopTimeAsString(stageId, userId){
     return getStageById(stageId)
         .then(stage => 
             getTime(stage.id, userId)
-                .then(result => `${stage.name}: ${result?.time || 'NA'}`)
+                .then(result => `${stage.name}: ${result?.time || 'NA'} by ${userId ? 'yourself :)' : result?.user.name || 'NA'}`)
         )
 }
 
@@ -145,7 +145,7 @@ function getStageTopTimeAsEmbed(stageId, userId){
         .then(stage =>
             getTime(stageId, userId)
                 .then(result => {
-                    return {name: result.mission.name, value: `${result.stage.name}: ${result?.time || 'NA'}`}
+                    return {name: result.mission.name, value: `${result.stage.name}: ${result?.time || 'NA'} by ${userId ? 'yourself :)' : result?.user.name || 'NA'}`}
                 })
         )
 }
