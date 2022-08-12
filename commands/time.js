@@ -21,7 +21,7 @@ module.exports = {
                 .setAutocomplete(true))
         .addStringOption(option => 
             option.setName('time')
-                .setDescription('Your achieved time (Format either MM:SS:sss or SS:sss)')
+                .setDescription('Your achieved time (Format either MM:SS.sss or SS.sss)')
                 .setRequired(true)),
     async execute(interaction){
         const userId = interaction.user.id;
@@ -37,7 +37,7 @@ module.exports = {
                     } else if (isLongTimestamp(timeParam)) {
                         return timeParam.padStart(9, '0');
                     } else {
-                        throw 'The time does not meet the required format of either MM:SS:sss or SS:sss.'
+                        throw 'The time does not meet the required format of either MM:SS.sss or SS.sss.'
                     }
                 } else {
                     throw 'You aren\'t registered to the leaderboard yet!'

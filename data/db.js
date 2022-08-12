@@ -150,6 +150,36 @@ function getStageTopTimeAsEmbed(stageId, userId){
         )
 }
 
+// return todo of given user, formatted as embed
+function getTodoAsEmbed(userId){
+    return getMissions()
+        .then(missions =>
+            // map every mission to a string list of the stages and their times 
+            Promise.all(
+                missions.map(mission =>
+                    // get the stages of the given mission
+                    getStagesByMission(mission.id)
+                        .then(stages => 
+                            Promise.all(
+                                // map the stages to a string of the name and the time, NA if no time was found
+                                stages.map(stage =>
+                                    getTime(stage.id)
+                                        .then(result => result.user.id === userId ? null : `${stage.name}: ${result?.time || 'NA'} by ${result?.user.name || 'NA'}`)
+                                )
+                            )
+                            .then(times => times?.filter(time => time)?.join('\n'))
+                        )
+                        // return the result in the required field format for the embed
+                        .then(stageTimes => {
+                            return stageTimes ? {name: mission.name, value: stageTimes} : null;
+                        })
+                )
+            )
+        )
+        .then(missions => missions.filter(mission => mission))
+        .then(missions => missions.length > 0 ? missions : [{name: 'Good job', value: 'You currently have nothing to do :)'}])
+}
+
 // add Discord user to db
 function insertUser(user){
     const data = {
@@ -181,4 +211,4 @@ function insertTime(userId, missionId, stageId, time){
     });
 }
 
-module.exports = {getMissions, getMissionById, getStages, getStageById, getStagesByMission, getTopTimes, getTopTimesByUser, getTime, getUser, getTopTimesAsEmbed, getMissionTopTimesAsEmbed, getStageTopTimeAsEmbed, insertUser, insertTime}
+module.exports = {getMissions, getMissionById, getStages, getStageById, getStagesByMission, getTopTimes, getTopTimesByUser, getTime, getUser, getTopTimesAsEmbed, getMissionTopTimesAsEmbed, getStageTopTimeAsEmbed, getTodoAsEmbed, insertUser, insertTime}
