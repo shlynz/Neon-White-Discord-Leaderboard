@@ -2,6 +2,29 @@ const fetch = require('node-fetch');
 require('dotenv').config();
 const URL = process.env.URL;
 
+const invalidIdText = 'Please use the autocomplete feature.\n\nIf you want, you could also input the mission id formatted like this:';
+const invalidMissionIdNormalMissionsText = '**Normal missions:** Number of the mission, padded to two digits, starting at 01.\n- **Example:** Rebirth would be "01", Thousand Pound Butterfly would be "11"';
+const invalidMissionIdSidequestText = '**Sidequests:** The first letters of their name.\n- **Example:** Neon Red would be "NR", Neon Yellow would be "NY"';
+const invalidStageIdNormalStageText = '**Stages:** Join the missionId and the Index of the stage in that Mission.\n- **Example:** Movement would be "0101", Marathon would be "1110", Choker would be "NV02"';
+const isValidMissionId = (missionId) => /[\dN][\dRVY]/.test(missionId);
+const invalidMissionIdText = [invalidIdText, invalidMissionIdNormalMissionsText, invalidMissionIdSidequestText].join('\n');
+const isValidStageId = (stageId) => /\d{4}|([\dN][\dRVY]0[1-8])/.test(stageId);
+const invalidStageIdText = [invalidIdText, invalidMissionIdNormalMissionsText, invalidMissionIdSidequestText, invalidStageIdNormalStageText].join('\n');
+
+function checkMissionId(missionId){
+    if(missionId && !isValidMissionId(missionId)){
+        console.log(missionId);
+        throw invalidMissionIdText;
+    }
+}
+
+function checkStageId(stageId){
+    if(stageId && !isValidStageId(stageId)){
+        console.log(stageId);
+        throw invalidStageIdText;
+    }
+}
+
 // returns all missions
 function getMissions(){
     return fetch(`${URL}/missions`)
@@ -10,6 +33,7 @@ function getMissions(){
 
 // returns a mission by id
 function getMissionById(missionId){
+    checkMissionId(missionId);
     return fetch(`${URL}/missions/${missionId}`)
         .then(res => res.json())
         .then(json => json[0]);
@@ -23,6 +47,7 @@ function getStages(){
 
 // return a stage by id
 function getStageById(stageId){
+    checkStageId(stageId);
     return fetch(`${URL}/stages/${stageId}`)
         .then(res => res.json())
         .then(json => json[0]);
@@ -30,6 +55,7 @@ function getStageById(stageId){
 
 // return all stages in mission by id
 function getStagesByMission(missionId){
+    checkMissionId(missionId);
     return fetch(`${URL}/missions/${missionId}/stages`)
         .then(res => res.json());
 }
@@ -68,6 +94,7 @@ function getTopTimesByUser(userId){
 
 // return the top time of the given stage, users best time if given
 function getTime(stageId, userId){
+    checkStageId(stageId);
     const fetchUrlEnd = userId
         ? `user/${userId}/top`
         : `top`;
@@ -113,6 +140,7 @@ function getTopTimesAsEmbed(userId){
 
 // return top times of given mission, formatted as embed ready, users best time if given
 function getMissionTopTimesAsEmbed(missionId, userId){
+    checkMissionId(missionId);
     return getMissionById(missionId)
         .then(mission =>
             getStagesByMission(mission.id)
@@ -132,6 +160,7 @@ function getMissionTopTimesAsEmbed(missionId, userId){
 
 // return top time of given stage, formatted as string (stageName: time or NA), users best time if given
 function getStageTopTimeAsString(stageId, userId){
+    checkStageId(stageId);
     return getStageById(stageId)
         .then(stage => 
             getTime(stage.id, userId)
@@ -141,6 +170,7 @@ function getStageTopTimeAsString(stageId, userId){
 
 // return top time of given stage, formatted as embed ready, users best time if given
 function getStageTopTimeAsEmbed(stageId, userId){
+    checkStageId(stageId);
     return getStageById(stageId)
         .then(stage =>
             getTime(stageId, userId)
@@ -196,6 +226,8 @@ function insertUser(user){
 
 // add time for specified stage to db
 function insertTime(userId, missionId, stageId, time){
+    checkMissionId(missionId);
+    checkStageId(stageId);
     const data = {
         userId,
         missionId,

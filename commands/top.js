@@ -44,7 +44,8 @@ module.exports = {
                     
             )
             .then(embed => interaction.reply({embeds: [embed]}))
-            .catch(error => 
+            .catch(error => {
+                console.log(error)
                 interaction.reply({embeds: [
                     new EmbedBuilder()
                     .setTitle('Error')
@@ -52,7 +53,7 @@ module.exports = {
                     .setDescription(error)
                     .setTimestamp()
                 ]})
-            )
+            })
 
     }
 }

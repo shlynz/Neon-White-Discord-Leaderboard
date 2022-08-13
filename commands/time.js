@@ -29,6 +29,8 @@ module.exports = {
         const stageId = interaction.options.getString('stage');
         const timeParam = interaction.options.getString('time');
 
+        let hasError = false;
+
         Promise.resolve(getUser(userId))
             .then(user => {
                 if(user){
@@ -52,13 +54,15 @@ module.exports = {
                             .setColor(0xFFFFFF)
                             .setDescription(`Your time of ${time} was added to the stage "${stage.name}" in the mission "${stage.mission.name}".`))
                     )
+                    .catch(error => {throw error})
             )
-            .catch(error =>
-                new EmbedBuilder()
+            .catch(error => {
+                hasError = true;
+                return new EmbedBuilder()
                     .setTitle('*ERROR*')
                     .setColor(0xFF0000)
                     .setDescription(error)
-            )
-            .then(embed => interaction.reply({embeds: [embed]}))
+            })
+            .then(embed => interaction.reply({embeds: [embed], ephemeral: hasError}))
     }
 };

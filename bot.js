@@ -72,6 +72,7 @@ function handleAutocompletes(interaction){
             .then(result => mapToOption(result))
             .then(options => options.filter(option => option.name.toLowerCase().includes(focusedOption)))
             .then(filteredOptions => interaction.respond(filteredOptions))
+            .catch(error => interaction.respond([]))
     }
 }
 
