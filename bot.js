@@ -57,7 +57,8 @@ function handleCommands(interaction){
 
 // handle autocomplete interactions
 function handleAutocompletes(interaction){
-    if(interaction.commandName === 'time' || interaction.commandName == 'toptime'){
+    const autocompleteCommands = ['time', 'toptime', 'deletetime']
+    if(autocompleteCommands.includes(interaction.commandName)){
         const missionId = interaction.options.getString('mission');
         const focusedOption = interaction.options.getFocused().toLowerCase();
 

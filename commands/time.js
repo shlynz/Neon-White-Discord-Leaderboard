@@ -31,7 +31,7 @@ module.exports = {
 
         let hasError = false;
 
-        Promise.resolve(getUser(userId))
+        getUser(userId)
             .then(user => {
                 if(user){
                     if(isShortTimestamp(timeParam)){

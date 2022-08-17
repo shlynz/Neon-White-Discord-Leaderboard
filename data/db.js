@@ -243,4 +243,16 @@ function insertTime(userId, missionId, stageId, time){
     });
 }
 
-module.exports = {getMissions, getMissionById, getStages, getStageById, getStagesByMission, getTopTimes, getTopTimesByUser, getTime, getUser, getTopTimesAsEmbed, getMissionTopTimesAsEmbed, getStageTopTimeAsEmbed, getTodoAsEmbed, insertUser, insertTime}
+function deleteTime(userId, stageId){
+    checkStageId(stageId);
+
+    return getTime(stageId, userId)
+        .then(res => {
+            fetch(`${URL}/times/${res.id}`, {
+                method: 'DELETE',
+            });
+            return res;
+        })
+}
+
+module.exports = {getMissions, getMissionById, getStages, getStageById, getStagesByMission, getTopTimes, getTopTimesByUser, getTime, getUser, getTopTimesAsEmbed, getMissionTopTimesAsEmbed, getStageTopTimeAsEmbed, getTodoAsEmbed, insertUser, insertTime, deleteTime}
