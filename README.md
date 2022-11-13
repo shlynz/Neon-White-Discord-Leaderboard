@@ -60,7 +60,7 @@ The current version of this bot is technically in a useable state, even though i
 ### TODOs
 - [x] Implement timekeeping, the main feature LUL
 - [x] Add a list of available commands
-- [ ] Add instructions on how to set up
+- [x] Add instructions on how to set up
 - [ ] Allow for confirmation after a user submits a new time
   - [ ] Allow for confirmation only after placing better than specified place
 - [ ] Improve usability to broaden the usecase of this bot (eg. Trackmania)
